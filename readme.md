@@ -2,14 +2,14 @@
 #### 该解决方案不支持手机验证码自动验证，所以使用带有短信验证码的开发者帐号时， 先执行 `checkLogin.rb 开发者帐号 开发者密码` 手动填写一次验证码， 下次就不需要在输入了
 
 ##### 文件说明
-> addUUid.rb 增加设备号, 增加 Bundle id 生成 设备授权文件 mobileprovision
-> checkLogin.rb 检查苹果帐号 是否可以正常登录
-> getCertificateId.rb 获取苹果账号下的 描述文件
-> globalConfig.rb 路径相关的基本配置
-> MysqlConfig.rb 相关mysql配置
-> saveCert.rb 根据p12 文件，生成相对应的 私钥和证书
-> signIpa.rb 重新签名 ipa包
-> signMobileConfig.rb 签名 mobileconfig 用来获取用户设备码
+1. addUUid.rb 增加设备号, 增加 Bundle id 生成 设备授权文件 mobileprovision
+2. checkLogin.rb 检查苹果帐号 是否可以正常登录
+3. getCertificateId.rb 获取苹果账号下的 描述文件
+3. globalConfig.rb 路径相关的基本配置
+4. mysqlConfig.rb 相关mysql配置
+5. saveCert.rb 根据p12 文件，生成相对应的 私钥和证书
+6. signIpa.rb 重新签名 ipa包
+7. signMobileConfig.rb 签名 mobileconfig 用来获取用户设备码
 
 
 ##### 执行步骤
