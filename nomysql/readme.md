@@ -14,9 +14,13 @@
 
 ##### 执行步骤
 1. 执行 checkLogin
+	ruby checkLogin.rb 用户名 密码
 2. 保存 saveCert p12
+	ruby saveCert.rb 用户名 密码 certificate的id p12绝对路径
 3. 添加 addUUid 且更新 profile
+	ruby addUUid.rb 用户名 密码 uuid bundleId certificateId
 4. 签名 signIpa
+	ruby signIpa.rb 用户名 密码 源ipa绝对路径 bundleId certificateId mobileProvision相对路径 certificatePem相对路径 keyPem 相对路径
 
 ##### 注意
 1. certificate_pem key_pem 所使用的的p12文件 必须和 mobileprovision的cer签名文件一致， 否则重新签名后也无法使用
@@ -42,8 +46,6 @@ gem install pry
 gem install spaceship
 gem install pry-coolline
 gem install rails
-gem install mysql2
-
 yum install zip
 
 python 2.7的环境, 不能是3.0的环境
