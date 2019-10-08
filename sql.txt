@@ -1,0 +1,73 @@
+
+#sql 表
+开发者表
+ CREATE TABLE `apple_developer` (
+  `apuid` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '开发者id',
+  `user` varchar(255) DEFAULT '' COMMENT '开发者帐号',
+  `password` varchar(255) DEFAULT '' COMMENT '密码',
+  `phone` varchar(255) DEFAULT '' COMMENT '手机号',
+  `uuid_num` int(11) DEFAULT '1' COMMENT '用户设备数量',
+  `status` int(11) DEFAULT '1' COMMENT '1.正常, 2.禁用',
+  `checked` int(11) DEFAULT '2' COMMENT '1.已信任服务器, 2.未信任设备',
+  `admin_id` int(11) DEFAULT '2' COMMENT '管理员id',
+  `c_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`apuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='开发者账号'
+
+证书表
+CREATE TABLE `apple_developer_cer` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
+  `certificate_id` varchar(255) DEFAULT '' COMMENT '证书id',
+  `certificate_pem` varchar(255) DEFAULT '' COMMENT '证书签名',
+  `key_pem` varchar(255) DEFAULT '' COMMENT '签名私钥',
+  `c_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `e_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `status` int(11) DEFAULT '1' COMMENT '1.正常, 2.禁用',
+  `admin_id` int(11) DEFAULT '1' COMMENT '管理员id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='证书表'
+
+打包日志表
+CREATE TABLE `apple_developer_ipa_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `uid` int(11) DEFAULT '0' COMMENT '平台用户uid',
+  `gid` int(11) DEFAULT '0' COMMENT '平台gid',
+  `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
+  `uuid` varchar(255) DEFAULT '' COMMENT '开发者帐号',
+  `certificate_id` varchar(255) DEFAULT '' COMMENT '苹果证书id',
+  `certificate_pem` varchar(255) DEFAULT '' COMMENT '苹果客户端证书路径',
+  `key_pem` varchar(255) DEFAULT '' COMMENT '苹果私钥路径',
+  `mobileprovision` varchar(255) DEFAULT '' COMMENT '授权证书路径',
+  `source_ipa` varchar(255) DEFAULT '' COMMENT '原包',
+  `to_ipa` varchar(255) DEFAULT '' COMMENT '打包后新包',
+  `plist` varchar(255) DEFAULT NULL COMMENT 'plist',
+  `build_id` varchar(255) DEFAULT NULL COMMENT 'build_id',
+  `status` int(11) DEFAULT '1' COMMENT '1.正常, 2.禁用',
+  `c_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `e_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '过期时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='打包日志表'
+
+mobileprovision 表
+CREATE TABLE `apple_developer_mobileprovision` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
+  `certificate_id` varchar(255) DEFAULT '' COMMENT 'certificate证书 Id',
+  `build_id` varchar(255) DEFAULT '' COMMENT 'build_id',
+  `mobileprovision` varchar(255) DEFAULT '' COMMENT 'mobileprovision',
+  `status` int(11) DEFAULT '1' COMMENT '1.正常, 2.禁用',
+  `c_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8
+
+用户设备表
+CREATE TABLE `apple_developer_uuid` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
+  `uuid` varchar(255) DEFAULT '' COMMENT '用户设备码',
+  `status` int(11) DEFAULT '1' COMMENT '1.正常, 2.禁用',
+  `c_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8
+
