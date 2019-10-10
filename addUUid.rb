@@ -16,11 +16,21 @@ bundleId = ARGV[4].to_s + '_' + apuid;
 
 mobileprovision = '/sign.mobileprovision'
 
+def ad_hocCreate(bundleId, certificateId, username)
+	cert = Spaceship::Portal.certificate.production.find(certificateId)
+	if !cert
+		raise "证书#{certificateObj['id']} 不存在"
+	end
+
+
+	#创建 ad_hoc
+	Spaceship::Portal.provisioning_profile.ad_hoc.create!(bundle_id: bundleId, certificate: cert, name: username)
+	sleep 1
+end
+
+
 begin
     # 绝对路径
-    cert_content = ARGV[2];
-    p12_path = GlobalConfig::ROOT_KEY + '/' + ARGV[3].to_s;
-
     Spaceship::Portal.login(username, password)
 
     #添加 bundleId
@@ -54,73 +64,78 @@ begin
         client.query("update apple_developer set uuid_num = '#{deviceLength}'  where apuid = '#{apuid}'")
 
     end
+	
+	#通过数据库 查询 证书id
+	results = client.query("SELECT certificate_id FROM apple_developer_cer where apuid = '#{apuid}' limit 1")
+	if !results.any?
+		raise "证书 不存在, 请先上传或者创建证书"
+	end
+	certificateObj = results.first
+	certificateId = certificateObj['certificate_id']
 
-    adHocAll = Spaceship.provisioning_profile.ad_hoc.all
-    if adHocAll.empty?
+	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
+		#遍历查找对应 bundleId 和 certificateId 的 profile
+        if p.certificates.first.id == certificateId && p.app.bundle_id == bundleId
+			ad_hocProfile = p
+		end
+    end
+	
+    if ad_hocProfile.blank? 
         #ad_hoc 不存在
-
-        #通过数据库 查询 证书id
-        results = client.query("SELECT certificate_id FROM apple_developer_cer where apuid = '#{apuid}' limit 1")
-        if !results.any?
-            raise "证书 不存在, 请先上传或者创建证书"
-        end
-
-
-        certificateObj = results.first
-
-        cert = Spaceship::Portal.certificate.production.find(certificateObj['certificate_id'])
-        if !cert
-            raise "证书#{certificateObj['id']} 不存在"
-        end
-
-
-        #创建 ad_hoc
-        profile = Spaceship::Portal.provisioning_profile.ad_hoc.create!(bundle_id: bundleId, certificate: cert, name: username)
+        ad_hocCreate(bundleId, certificateId, username)
+		sleep 1
+		ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
+	
+	if ad_hocProfile.blank? 
+		raise "ad_hoc profile 生成失败"
+	end
+	
+	#设备号
+	devices = Spaceship.device.all
+	# 根据cert 证书创建
+    #更新 ad_hoc
+	ad_hocProfile.devices = devices
+	ad_hocProfile.update!
+	
+	# 重新从线上获取数据
+	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
+	
+		if p.id == ad_hocProfile.id
+		
+			# 根据cert 证书创建
+			# profile 写到对应的文件夹,以便更新
+			c_time = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+			mobileprovision =  '/applesign/' + username + '/' + certificateId + mobileprovision
+			keyPath = GlobalConfig::ROOT_KEY +  '/applesign/' + username + '/' + certificateId
+			system "mkdir -p #{keyPath}"
+			system "chmod 777 #{keyPath}"
+			
+			File.write(GlobalConfig::ROOT_KEY + mobileprovision, p.download)
 
-    devices = Spaceship.device.all
-    Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-        # 根据cert 证书创建
-        #更新 ad_hoc
-        p.devices = devices
-        p.update!
-    end
+			# 保存uuid
+			uUser = client.query("SELECT id FROM apple_developer_uuid WHERE uuid= '#{uuid}'")
+			if uUser.any?
+				client.query("update apple_developer_uuid set apuid = '#{apuid}' where uuid = '#{uuid}' ")
+			else
+				client.query("insert into apple_developer_uuid (apuid,uuid,c_time)values('#{apuid}', '#{uuid}', '#{c_time}')")
+			end
 
-    # profile 写到对应的文件夹,以便更新
-    c_time =  #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}
-    Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-        # 根据cert 证书创建
+			# 保存mobileprovision
+			#  uUser = client.query("SELECT id FROM apple_developer_mobileprovision WHERE  build_id= '#{bundleId}' and certificate_id = '#{certificateId}'")
+			mobileProvisionObj = client.query("SELECT id FROM apple_developer_mobileprovision WHERE certificate_id = '#{certificateId}'")
 
-        certificateId = p.certificates.first.id
-        mobileprovision =  '/applesign/' + username + '/' + certificateId + mobileprovision
-        keyPath = GlobalConfig::ROOT_KEY +  '/applesign/' + username + '/' + certificateId
-        system "mkdir -p #{keyPath}"
-        system "chmod 777 #{keyPath}"
-
-       # File.open(GlobalConfig::ROOT_KEY + mobileprovision,"a+") do |f|
-       #   f.puts p.download
-       # end
-
-       File.write(GlobalConfig::ROOT_KEY + mobileprovision, p.download)
-
-        # 保存uuid
-        uUser = client.query("SELECT id FROM apple_developer_uuid WHERE uuid= '#{uuid}'")
-        if uUser.any?
-            client.query("update apple_developer_uuid set apuid = '#{apuid}' where uuid = '#{uuid}' ")
-        else
-            client.query("insert into apple_developer_uuid (apuid,uuid,c_time)values('#{apuid}', '#{uuid}', '#{c_time}')")
-        end
-
-        # 保存mobileprovision
-        #  uUser = client.query("SELECT id FROM apple_developer_mobileprovision WHERE  build_id= '#{bundleId}' and certificate_id = '#{certificateId}'")
-        mobileProvisionObj = client.query("SELECT id FROM apple_developer_mobileprovision WHERE certificate_id = '#{certificateId}'")
-
-        if mobileProvisionObj.any?
-            client.query("update apple_developer_mobileprovision set mobileprovision = '#{mobileprovision}' where certificate_id = '#{certificateId}' and build_id= '#{bundleId}'")
-        else
-            client.query("insert into apple_developer_mobileprovision (apuid, certificate_id, build_id, mobileprovision, c_time)values('#{apuid}', '#{certificateId}', '#{bundleId}', '#{mobileprovision}', '#{c_time}')")
-        end
-    end
+			if mobileProvisionObj.any?
+				client.query("update apple_developer_mobileprovision set mobileprovision = '#{mobileprovision}' where certificate_id = '#{certificateId}' and build_id= '#{bundleId}'")
+			else
+				client.query("insert into apple_developer_mobileprovision (apuid, certificate_id, build_id, mobileprovision, c_time)values('#{apuid}', '#{certificateId}', '#{bundleId}', '#{mobileprovision}', '#{c_time}')")
+			end
+		
+		end
+	
+	end
+	
+	
 
 rescue Exception  => e
      puts "Trace message: #{e}"

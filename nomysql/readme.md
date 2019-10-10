@@ -20,7 +20,7 @@
 3. 添加 addUUid 且更新 profile
 	ruby addUUid.rb 用户名 密码 uuid bundleId certificateId
 4. 签名 signIpa
-	ruby signIpa.rb 用户名 密码 源ipa绝对路径 bundleId certificateId mobileProvision相对路径 certificatePem相对路径 keyPem 相对路径
+	ruby signIpa.rb 用户名 uuid 源ipa绝对路径 bundleId certificateId mobileProvision相对路径 certificatePem相对路径 keyPem 相对路径
 
 ##### 注意
 1. certificate_pem key_pem 所使用的的p12文件 必须和 mobileprovision的cer签名文件一致， 否则重新签名后也无法使用

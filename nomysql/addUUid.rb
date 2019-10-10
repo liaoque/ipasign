@@ -15,6 +15,18 @@ certificateId = ARGV[4].to_s;
 
 mobileprovision = '/sign.mobileprovision'
 
+def ad_hocCreate(bundleId, certificateId, username)
+	cert = Spaceship::Portal.certificate.production.find(certificateId)
+	if !cert
+		raise "证书#{certificateObj['id']} 不存在"
+	end
+
+
+	#创建 ad_hoc
+	Spaceship::Portal.provisioning_profile.ad_hoc.create!(bundle_id: bundleId, certificate: cert, name: username)
+	sleep 1
+end
+
 begin
     # 绝对路径
 
@@ -41,46 +53,46 @@ begin
         deviceLength = Spaceship::Portal.device.all.length
     end
 
-    adHocAll = Spaceship.provisioning_profile.ad_hoc.all
-    if adHocAll.empty?
-        #ad_hoc 不存在
-
-        cert = Spaceship::Portal.certificate.production.find(certificateId)
-        if !cert
-            raise "证书#{certificateId} 不存在"
-        end
-
-
-        #创建 ad_hoc
-        profile = Spaceship::Portal.provisioning_profile.ad_hoc.create!(bundle_id: bundleId, certificate: cert, name: username)
-    end
-
-    devices = Spaceship.device.all
+    #遍历查找对应 bundleId 和 certificateId 的 profile
     Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-        # 根据cert 证书创建
-        #更新 ad_hoc
-        p.devices = devices
-        p.update!
+        if p.certificates.first.id == certificateId && p.app.bundle_id == bundleId
+			ad_hocProfile = p
+		end
     end
-
-    # profile 写到对应的文件夹,以便更新
-    c_time =  #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}
-    Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-        # 根据cert 证书创建
-
-        certificateId = p.certificates.first.id
-        mobileprovision =  '/applesign/' + username + '/' + certificateId + mobileprovision
-        keyPath = GlobalConfig::ROOT_KEY +  '/applesign/' + username + '/' + certificateId
-        system "mkdir -p #{keyPath}"
-        system "chmod 777 #{keyPath}"
-
-       # File.open(GlobalConfig::ROOT_KEY + mobileprovision,"a+") do |f|
-       #   f.puts p.download
-       # end
-
-       File.write(GlobalConfig::ROOT_KEY + mobileprovision, p.download)
-
+	
+	#ad_hoc 不存在
+    if ad_hocProfile.blank? 
+        ad_hocCreate(bundleId, certificateId, username)
+		sleep 1
+		ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
+	
+	if ad_hocProfile.blank? 
+		raise "ad_hoc profile 生成失败"
+	end
+	
+	#设备号
+	devices = Spaceship.device.all
+	# 根据cert 证书创建
+    #更新 ad_hoc
+	ad_hocProfile.devices = devices
+	ad_hocProfile.update!
+	
+	# 重新从线上获取数据
+	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
+		if p.id == ad_hocProfile.id
+			# 根据cert 证书创建
+			# profile 写到对应的文件夹,以便更新
+			c_time = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+			mobileprovision =  '/applesign/' + username + '/' + certificateId + mobileprovision
+			keyPath = GlobalConfig::ROOT_KEY +  '/applesign/' + username + '/' + certificateId
+			system "mkdir -p #{keyPath}"
+			system "chmod 777 #{keyPath}"
+			
+			File.write(GlobalConfig::ROOT_KEY + mobileprovision, p.download)
+		end
+	
+	end
 
 rescue Exception  => e
      puts "Trace message: #{e}"
