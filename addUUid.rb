@@ -102,7 +102,7 @@ begin
 	# 重新从线上获取数据
 	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
 	
-		if p.id == $ad_hocProfile.id
+		if p.name == $ad_hocProfile.name
 		
 			# 根据cert 证书创建
 			# profile 写到对应的文件夹,以便更新
