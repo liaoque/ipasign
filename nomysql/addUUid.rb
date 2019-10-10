@@ -9,7 +9,7 @@ require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
 username = ARGV[0].to_s;
 password = ARGV[1].to_s;
 uuid = ARGV[2].to_s;
-bundleId = ARGV[3].to_s + '_' + username;
+bundleId = ARGV[3].to_s;
 certificateId = ARGV[4].to_s;
 
 
@@ -61,13 +61,13 @@ begin
     end
 	
 	#ad_hoc 不存在
-    if ad_hocProfile.blank? 
+	if !defined? adhocProfile
         ad_hocCreate(bundleId, certificateId, username)
 		sleep 1
 		ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
 	
-	if ad_hocProfile.blank? 
+	if !defined? adhocProfile
 		raise "ad_hoc profile 生成失败"
 	end
 	

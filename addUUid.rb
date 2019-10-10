@@ -79,15 +79,15 @@ begin
 			ad_hocProfile = p
 		end
     end
-	
-    if ad_hocProfile.blank? 
+
+	if !defined? adhocProfile
         #ad_hoc 不存在
         ad_hocCreate(bundleId, certificateId, username)
 		sleep 1
 		ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
 	
-	if ad_hocProfile.blank? 
+	if !defined? adhocProfile
 		raise "ad_hoc profile 生成失败"
 	end
 	
