@@ -56,18 +56,20 @@ begin
     #遍历查找对应 bundleId 和 certificateId 的 profile
     Spaceship.provisioning_profile.ad_hoc.all.each do |p|
         if p.certificates.first.id == certificateId && p.app.bundle_id == bundleId
-			ad_hocProfile = p
+			$ad_hocProfile = p
+			break
 		end
     end
 	
+	
 	#ad_hoc 不存在
-	if !defined? adhocProfile
-        ad_hocCreate(bundleId, certificateId, username)
+	if !defined? $ad_hocProfile
+        ad_hocCreate(bundleId, certificateId, bundleId)
 		sleep 1
-		ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
+		$ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
 	
-	if !defined? adhocProfile
+	if !defined? $ad_hocProfile
 		raise "ad_hoc profile 生成失败"
 	end
 	
@@ -75,12 +77,12 @@ begin
 	devices = Spaceship.device.all
 	# 根据cert 证书创建
     #更新 ad_hoc
-	ad_hocProfile.devices = devices
-	ad_hocProfile.update!
+	$ad_hocProfile.devices = devices
+	$ad_hocProfile.update!
 	
 	# 重新从线上获取数据
 	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-		if p.id == ad_hocProfile.id
+		if p.id == $ad_hocProfile.id
 			# 根据cert 证书创建
 			# profile 写到对应的文件夹,以便更新
 			c_time = Time.now.strftime("%Y-%m-%d %H:%M:%S")
@@ -90,6 +92,7 @@ begin
 			system "chmod 777 #{keyPath}"
 			
 			File.write(GlobalConfig::ROOT_KEY + mobileprovision, p.download)
+			break
 		end
 	
 	end
