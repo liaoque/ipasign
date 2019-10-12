@@ -14,7 +14,7 @@ uuid = ARGV[3].to_s;
 bundleId = ARGV[4].to_s + '_' + apuid;
 
 
-mobileprovision = '/sign.mobileprovision'
+mobileprovision =  '/sign.' + bundleId + '.mobileprovision'
 
 def ad_hocCreate(bundleId, certificateId, username)
 	cert = Spaceship::Portal.certificate.production.find(certificateId)
