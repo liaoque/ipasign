@@ -11,10 +11,11 @@ apuid = ARGV[0].to_s;
 username = ARGV[1].to_s;
 password = ARGV[2].to_s;
 uuid = ARGV[3].to_s;
-bundleId = ARGV[4].to_s + '_' + apuid;
+_bundleId = ARGV[4].to_s ;
 
-
-mobileprovision =  '/sign.' + bundleId + '.mobileprovision'
+# 保证 bundleId 全局 唯一
+bundleId = _bundleId + apuid;
+mobileprovision = '/sign.' + _bundleId + '.mobileprovision'
 
 def ad_hocCreate(bundleId, certificateId, username)
 	cert = Spaceship::Portal.certificate.production.find(certificateId)
