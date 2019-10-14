@@ -88,21 +88,21 @@ begin
 		sleep 1
 		$ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
-	
+
 	if !defined? $ad_hocProfile
 		raise "ad_hoc profile 生成失败"
 	end
-	
+
 	#设备号
 	devices = Spaceship.device.all
 	# 根据cert 证书创建
     #更新 ad_hoc
 	$ad_hocProfile.devices = devices
 	$ad_hocProfile.update!
-	
+
 	# 重新从线上获取数据
 	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-	
+
 		if p.name == $ad_hocProfile.name
 		
 			# 根据cert 证书创建
@@ -118,19 +118,19 @@ begin
 			# 保存uuid
 			uUser = client.query("SELECT id FROM apple_developer_uuid WHERE uuid= '#{uuid}'")
 			if uUser.any?
-				client.query("update apple_developer_uuid set apuid = '#{apuid}' where uuid = '#{uuid}' ")
+				client.query("update apple_developer_uuid set apuid = '#{apuid}', status = 1 where uuid = '#{uuid}' ")
 			else
 				client.query("insert into apple_developer_uuid (apuid,uuid,c_time)values('#{apuid}', '#{uuid}', '#{c_time}')")
 			end
 
 			# 保存mobileprovision
-			#  uUser = client.query("SELECT id FROM apple_developer_mobileprovision WHERE  build_id= '#{bundleId}' and certificate_id = '#{certificateId}'")
-			mobileProvisionObj = client.query("SELECT id FROM apple_developer_mobileprovision WHERE certificate_id = '#{certificateId}'")
+			# uUser = client.query("SELECT id FROM apple_developer_mobileprovision WHERE  build_id= '#{_bundleId}' and certificate_id = '#{certificateId}'")
+			mobileProvisionObj = client.query("SELECT id FROM apple_developer_mobileprovision WHERE  build_id= '#{_bundleId}' and certificate_id = '#{certificateId}'")
 
 			if mobileProvisionObj.any?
-				client.query("update apple_developer_mobileprovision set mobileprovision = '#{mobileprovision}' where certificate_id = '#{certificateId}' and build_id= '#{bundleId}'")
+				client.query("update apple_developer_mobileprovision set mobileprovision = '#{mobileprovision}' where certificate_id = '#{certificateId}' and build_id= '#{_bundleId}'")
 			else
-				client.query("insert into apple_developer_mobileprovision (apuid, certificate_id, build_id, mobileprovision, c_time)values('#{apuid}', '#{certificateId}', '#{bundleId}', '#{mobileprovision}', '#{c_time}')")
+				client.query("insert into apple_developer_mobileprovision (apuid, certificate_id, build_id, mobileprovision, c_time)values('#{apuid}', '#{certificateId}', '#{_bundleId}', '#{mobileprovision}', '#{c_time}')")
 			end
 		
 		end
