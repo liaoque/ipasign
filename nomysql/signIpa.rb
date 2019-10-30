@@ -9,19 +9,19 @@ require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
 
 
 #开发者帐号
-username = ARGV[0];
+username = ARGV[0].to_s;
 #用户duid
-uuid = ARGV[1];
+uuid = ARGV[1].to_s;
 #打包文件
-inFile = ARGV[2];
+inFile = ARGV[2].to_s;
 #包名
-bundleId = ARGV[3];
-certificateId = ARGV[4];
+bundleId = ARGV[3].to_s;
+certificateId = ARGV[4].to_s;
 
 #相对路径
-mobileProvision = ARGV[5];
-certificatePem = ARGV[6];
-keyPem = ARGV[7];
+mobileProvision = ARGV[5].to_s;
+certificatePem = ARGV[6].to_s;
+keyPem = ARGV[7].to_s;
 
 gid = 0;
 gameName = bundleId;

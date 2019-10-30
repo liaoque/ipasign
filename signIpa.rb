@@ -8,12 +8,12 @@ require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
 # 否则重新签名后也无法使用
 
 
-inFile = ARGV[0];
-uid = ARGV[1];
-uuid = ARGV[2];
-gid = ARGV[3];
-gameName = ARGV[4];
-bundleId = ARGV[5];
+inFile = ARGV[0].to_s;
+uid = ARGV[1].to_s;
+uuid = ARGV[2].to_s;
+gid = ARGV[3].to_s;
+gameName = ARGV[4].to_s;
+bundleId = ARGV[5].to_s;
 
 #加入打包日志
 cTime = Time.now
