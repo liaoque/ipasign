@@ -67,24 +67,27 @@ begin
     end
 	
 	#通过数据库 查询 证书id
-	results = client.query("SELECT certificate_id FROM apple_developer_cer where apuid = '#{apuid}' limit 1")
+	results = client.query("SELECT certificate_id FROM apple_developer_cer where apuid = '#{apuid}' and status = 1 limit 1")
 	if !results.any?
 		raise "证书 不存在, 请先上传或者创建证书"
 	end
 	certificateObj = results.first
 	certificateId = certificateObj['certificate_id']
 
+
 	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
 		#遍历查找对应 bundleId 和 certificateId 的 profile
-        if p.certificates.first.id == certificateId && p.app.bundle_id == bundleId
-			$ad_hocProfile = p
-			break
+		p.certificates.each do |cs|
+		if cs.id == certificateId && p.app.bundle_id == bundleId
+                $ad_hocProfile = p
+                break
+            end
 		end
     end
 
 	if !defined? $ad_hocProfile
         #ad_hoc 不存在
-        ad_hocCreate(bundleId, certificateId, bundleId)
+        ad_hocCreate(bundleId, certificateId, bundleId + '.' + certificateId)
 		sleep 1
 		$ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end

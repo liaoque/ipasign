@@ -54,17 +54,20 @@ begin
     end
 
     #遍历查找对应 bundleId 和 certificateId 的 profile
-    Spaceship.provisioning_profile.ad_hoc.all.each do |p|
-        if p.certificates.first.id == certificateId && p.app.bundle_id == bundleId
-			$ad_hocProfile = p
-			break
+	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
+		#遍历查找对应 bundleId 和 certificateId 的 profile
+		p.certificates.each do |cs|
+		if cs.id == certificateId && p.app.bundle_id == bundleId
+                $ad_hocProfile = p
+                break
+            end
 		end
     end
 	
 	
 	#ad_hoc 不存在
 	if !defined? $ad_hocProfile
-        ad_hocCreate(bundleId, certificateId, bundleId)
+        ad_hocCreate(bundleId, certificateId, bundleId + '.' + certificateId)
 		sleep 1
 		$ad_hocProfile = Spaceship.provisioning_profile.ad_hoc.all.first
     end
