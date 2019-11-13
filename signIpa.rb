@@ -43,8 +43,8 @@ begin
     username = results.first['user']
 
     #寻找对应的授权文件
-   # puts "SELECT mobileprovision,certificate_id  FROM apple_developer_mobileprovision WHERE apuid= '#{apuid}'"
-    results = client.query("SELECT mobileprovision,certificate_id  FROM apple_developer_mobileprovision WHERE apuid= '#{apuid}' and build_id='#{bundleId}'")
+   # puts "SELECT mobileprovision,certificate_id  FROM apple_developer_mobileprovision WHERE apuid= '#{apuid}' and status = 1"
+    results = client.query("SELECT mobileprovision,certificate_id  FROM apple_developer_mobileprovision WHERE apuid= '#{apuid}' and build_id='#{bundleId}' and status = 1")
     if !results.any?
         raise "mobileprovision 不存在"
     end
