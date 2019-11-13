@@ -29,7 +29,7 @@ begin
                 :encoding => MysqlConfig::CHARSET      # 编码
             )
 
-          #  client.query("update kxwweb.apple_dever set checked = 1 where user = #{username}")
+          #  client.query("update kxwweb.apple_developer set checked = 1 where user = #{username}")
             break
         when nil
             raise "验证错误：退出"
@@ -45,6 +45,7 @@ begin
         raise "验证手机号超时"
     end
 rescue Exception  => e
+	# client.query("update kxwweb.apple_developer set checked = 2 where user = #{username}")
      puts "Trace message: #{e.message}"
 else
      puts "Success message: 帐号密码校验成功"
