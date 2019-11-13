@@ -35,20 +35,23 @@ begin
         cTime = certificateObj.created
         eTime = certificateObj.expires
 
-    #   载入证书
-        certificate = OpenSSL::X509::Certificate.new csr
-
-         keyPath = GlobalConfig::ROOT_KEY + '/applesign/' + username + '/' + certificateId
-         system "mkdir -p #{keyPath}"
-         system "chmod 777 #{keyPath}"
-
-
     #   写入证书
+        x509_certificate = certificateObj.download
 
-        File.write(keyPath + clientKey, certificate.to_pem)
-        File.write(keyPath + privateKey, pkey.to_pem)
-        clientKey = '/applesign/' + username + '/' + certificateId + clientKey;
-        privateKey =  '/applesign/' + username + '/' + certificateId + privateKey;
+        # cer证书
+        File.write(keyPath + "/#{certificateId}.csr", csr.to_der)
+        # 私钥
+        File.write(keyPath + "/#{certificateId}.pkey", pkey.to_pem)
+
+        # p12文件
+        p12Key =  "/#{certificateId}.p12";
+        p12Path = keyPath + p12Key
+        p12 = OpenSSL::PKCS12.create('', 'production', pkey, x509_certificate)
+        File.write(p12Path, p12.to_der)
+
+        # x509_cer
+        x509_cert_path = keyPath + "/#{certificateId}.x509_cert_path.pem"
+        File.write(x509_cert_path, x509_certificate.to_pem + pkey.to_pem)
 
     else
         if p12Path.empty?
@@ -63,29 +66,26 @@ begin
         keyPath = GlobalConfig::ROOT_KEY + '/applesign/' + username + '/' + certificateId
         system "mkdir -p #{keyPath}"
         system "chmod 777 #{keyPath}"
-
-        #  isign_export_creds.sh 证书.p12
-        #  openssl pkcs12 -in $p12_path -out $target_cert_path -clcerts -nokeys
-        #  openssl pkcs12 -in $p12_path -out $target_key_path -nocerts -nodes
-
-        # puts  "openssl pkcs12 -password pass: -in #{p12Path} -out #{keyPath + clientKey} -clcerts -nokeys"
-
-        output =  system "openssl pkcs12 -password pass: -in #{p12Path} -out #{keyPath + clientKey} -clcerts -nokeys"
-        if !output
-            raise puts  "openssl pkcs12  -password pass: -in #{p12Path} -out #{keyPath + clientKey} -clcerts -nokeys  失败"
-        end
-
-        output = system "openssl pkcs12  -password pass: -in #{p12Path} -out #{keyPath + privateKey} -nocerts -nodes"
-        if !output
-            raise puts  "openssl pkcs12  -password pass: -in #{p12Path} -out #{keyPath + privateKey} -nocerts -nodes  失败"
-        end
-
-
-        clientKey = '/applesign/' + username + '/' + certificateId + clientKey;
-        privateKey =  '/applesign/' + username + '/' + certificateId + privateKey;
-
     end
 
+  #  isign_export_creds.sh 证书.p12
+  #  openssl pkcs12 -in $p12_path -out $target_cert_path -clcerts -nokeys
+  #  openssl pkcs12 -in $p12_path -out $target_key_path -nocerts -nodes
+  # puts  "openssl pkcs12 -password pass: -in #{p12Path} -out #{keyPath + clientKey} -clcerts -nokeys"
+
+    output =  system "openssl pkcs12 -password pass: -in #{p12Path} -out #{keyPath + clientKey} -clcerts -nokeys"
+    if !output
+        raise puts  "openssl pkcs12  -password pass: -in #{p12Path} -out #{keyPath + clientKey} -clcerts -nokeys  失败"
+    end
+
+    output = system "openssl pkcs12  -password pass: -in #{p12Path} -out #{keyPath + privateKey} -nocerts -nodes"
+    if !output
+        raise puts  "openssl pkcs12  -password pass: -in #{p12Path} -out #{keyPath + privateKey} -nocerts -nodes  失败"
+    end
+
+
+    clientKey = '/applesign/' + username + '/' + certificateId + clientKey;
+    privateKey =  '/applesign/' + username + '/' + certificateId + privateKey;
 
 rescue Exception  => e
     puts "Trace message: #{e.errstr}"
