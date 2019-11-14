@@ -53,9 +53,9 @@ begin
     certificateId = results.first['certificate_id']
 
    # puts "SELECT certificate_pem,key_pem FROM apple_developer_cer WHERE certificate_id= '#{certificateId}'"
-    results = client.query("SELECT certificate_pem,key_pem FROM apple_developer_cer WHERE certificate_id= '#{certificateId}'")
+    results = client.query("SELECT certificate_pem,key_pem FROM apple_developer_cer WHERE certificate_id= '#{certificateId}' and status = 1")
     if !results.any?
-        raise "certificate_id: #{certificate_id} 不存在"
+        raise "certificate_id: #{certificateId} 不存在"
     end
 
     certificatePem = results.first['certificate_pem']

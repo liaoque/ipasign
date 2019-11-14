@@ -20,7 +20,7 @@ mobileprovision = '/sign.' + _bundleId + '.mobileprovision'
 def ad_hocCreate(bundleId, certificateId, username)
 	cert = Spaceship::Portal.certificate.production.find(certificateId)
 	if !cert
-		raise "证书#{certificateObj['id']} 不存在"
+		raise "证书#{certificateId} 不存在"
 	end
 
 
