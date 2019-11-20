@@ -2,8 +2,9 @@ require "spaceship"
 require 'openssl'
 require "mysql2"
 require 'pathname'
-require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlConfig'
 require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
+require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/userLogin'
+require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlInstance'
 
 #参考 https://github.com/fastlane/fastlane/blob/master/spaceship/docs/DeveloperPortal.md
 
@@ -32,7 +33,8 @@ end
 
 begin
     # 绝对路径
-    Spaceship::Portal.login(username, password)
+	ulogin = UserLogin.new(username, password, 1)
+	ulogin.login()
 
     #添加 bundleId
     app = Spaceship::Portal.app.find(bundleId)
@@ -48,13 +50,7 @@ begin
     end
 
     # 连接mysql
-    client = Mysql2::Client.new(
-        :host     => MysqlConfig::HOST,     # 主机
-        :username => MysqlConfig::USER,      # 用户名
-        :password => MysqlConfig::PASSWORD,    # 密码
-        :database => MysqlConfig::DBNAME,      # 数据库
-        :encoding => MysqlConfig::CHARSET      # 编码
-    )
+    client = MysqlInstance.instance.getClient();
 
     #如果uuid不存在则添加uuid
     if !Spaceship::Portal.device.find_by_udid(uuid)
@@ -73,7 +69,6 @@ begin
 	end
 	certificateObj = results.first
 	certificateId = certificateObj['certificate_id']
-
 
 	Spaceship.provisioning_profile.ad_hoc.all.each do |p|
 		#遍历查找对应 bundleId 和 certificateId 的 profile
@@ -101,6 +96,7 @@ begin
 	# 根据cert 证书创建
     #更新 ad_hoc
 	$ad_hocProfile.devices = devices
+	#$ad_hocProfile.update_service(Spaceship::Portal.app_service.push_notification.on)
 	$ad_hocProfile.update!
 
 	# 重新从线上获取数据
@@ -143,12 +139,12 @@ begin
 	
 
 rescue Exception  => e
-     puts "Trace message: #{e}"
+    puts "Trace message: #{e}"
 else
     puts "Success message: uuid添加成功"
 ensure
      # 断开与服务器的连接
-     client.close if client
+    # MysqlInstance.instance.close()
 end
 
 

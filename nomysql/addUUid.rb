@@ -81,6 +81,7 @@ begin
 	# 根据cert 证书创建
     #更新 ad_hoc
 	$ad_hocProfile.devices = devices
+	#$ad_hocProfile.update_service(Spaceship::Portal.app_service.push_notification.on)
 	$ad_hocProfile.update!
 	
 	# 重新从线上获取数据

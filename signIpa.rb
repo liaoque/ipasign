@@ -1,19 +1,19 @@
 require "spaceship"
 require "mysql2"
 require 'pathname'
-require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlConfig'
 require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
+require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlInstance'
 
 # certificate_pem key_pem 所使用的的p12文件 必须和 mobileprovision的cer签名文件一致
 # 否则重新签名后也无法使用
 
 
-inFile = ARGV[0].to_s;
-uid = ARGV[1].to_s;
-uuid = ARGV[2].to_s;
-gid = ARGV[3].to_s;
-gameName = ARGV[4].to_s;
-bundleId = ARGV[5].to_s;
+inFile = ARGV[0];
+uid = ARGV[1];
+uuid = ARGV[2];
+gid = ARGV[3];
+gameName = ARGV[4];
+bundleId = ARGV[5];
 
 #加入打包日志
 cTime = Time.now
@@ -21,13 +21,7 @@ eTime = cTime + 31536000
 
 # 更新mysql
 begin
-    client = Mysql2::Client.new(
-        :host     => MysqlConfig::HOST,     # 主机
-        :username => MysqlConfig::USER,      # 用户名
-        :password => MysqlConfig::PASSWORD,    # 密码
-        :database => MysqlConfig::DBNAME,      # 数据库
-        :encoding => MysqlConfig::CHARSET      # 编码
-    )
+    client = MysqlInstance.instance.getClient();
 
     #寻找对应的开发者
     results = client.query("SELECT apuid FROM apple_developer_uuid WHERE uuid='#{uuid}' limit 1")
@@ -79,8 +73,10 @@ begin
     system "rm -rf #{_outFile}"
 
     # puts "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
-    system "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
-
+    res = system "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
+    if !res
+        raise "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile} 失败"
+    end
 
     plist = "/applesign/#{username}/#{certificateId}/#{gid}/#{uuid}_#{cTime.strftime("%Y%m%d%H%M%S")}.plist"
 
@@ -129,7 +125,7 @@ else
      puts outFile
 ensure
      # 断开与服务器的连接
-     client.close if client
+    # MysqlInstance.instance.close()
 end
 
 

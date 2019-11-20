@@ -2,8 +2,9 @@ require "spaceship"
 require 'openssl'
 require "mysql2"
 require 'pathname'
-require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlConfig'
 require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
+require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/userLogin'
+require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlInstance'
 
 
 #参考 https://github.com/fastlane/fastlane/blob/master/spaceship/docs/DeveloperPortal.md
@@ -22,7 +23,8 @@ clientKey = '/client_key.pem';
 privateKey = '/private_key.pem';
 
 begin
-    Spaceship::Portal.login(username, password)
+	ulogin = UserLogin.new(username, password, 1)
+	ulogin.login()
 
     # 获取所有证书
     certificates = Spaceship::Portal.certificate.all
@@ -101,13 +103,7 @@ begin
 
 
     # 更新mysql
-    client = Mysql2::Client.new(
-        :host     => MysqlConfig::HOST,     # 主机
-        :username => MysqlConfig::USER,      # 用户名
-        :password => MysqlConfig::PASSWORD,    # 密码
-        :database => MysqlConfig::DBNAME,      # 数据库
-        :encoding => MysqlConfig::CHARSET      # 编码
-    )
+    client = MysqlInstance.instance.getClient();
 
     #查询 证书id是否存在
     results = client.query("SELECT id FROM apple_developer_cer WHERE certificate_id= '#{certificateId}'")
@@ -125,7 +121,7 @@ else
     puts "Success message: 保存证书成功"
 ensure
      # 断开与服务器的连接
-     client.close if client
+    # MysqlInstance.instance.close()
 end
 
 
