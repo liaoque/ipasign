@@ -53,6 +53,7 @@ git clone https://github.com/apperian/isign
 sh version.sh
 python setup.py build
 python setup.py install
+有发现 sh version.sh 执行报错的, 升级下git, git版本要求1.8以上 
 
 ```
 更详细的请看： https://blog.csdn.net/LiaoQuesg/article/details/101219984
