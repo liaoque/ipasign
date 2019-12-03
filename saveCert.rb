@@ -2,6 +2,7 @@ require "spaceship"
 require 'openssl'
 require "mysql2"
 require 'pathname'
+require 'time'
 require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/globalConfig'
 require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/userLogin'
 require Pathname.new(File.dirname(__FILE__)).realpath.to_s + '/mysqlInstance'
@@ -107,6 +108,10 @@ begin
 
     #查询 证书id是否存在
     results = client.query("SELECT id FROM apple_developer_cer WHERE certificate_id= '#{certificateId}'")
+	
+	
+	cTime = Time.parse(cTime).strftime("%Y-%m-%d %H:%M:%S")
+	eTime = Time.parse(eTime).strftime("%Y-%m-%d %H:%M:%S")
     if results.any?
         #存在 更新
         client.query("update apple_developer_cer set certificate_pem = '#{clientKey}', key_pem = '#{privateKey}', c_time = '#{cTime}', e_time = '#{eTime}' where certificate_id = '#{certificateId}'")
