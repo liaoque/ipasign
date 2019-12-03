@@ -10,7 +10,7 @@
 5. saveCert.rb 根据p12 文件，生成相对应的 私钥和证书
 6. signIpa.rb 重新签名 ipa包
 7. signMobileConfig.rb 签名 mobileconfig 用来获取用户设备码
-
+8. createP12.rb 用来创建p12文件
 
 ##### 执行步骤
 1. 执行 checkLogin
