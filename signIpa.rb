@@ -73,9 +73,9 @@ begin
     system "rm -rf #{_outFile}"
 
     # puts "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
-    res = system "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
+    res = system "/usr/bin/python ./signIpa.py   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
     if !res
-        raise "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile} 失败"
+        raise "/usr/bin/python ./signIpa.py   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile} 失败"
     end
 
     plist = "/applesign/#{username}/#{certificateId}/#{gid}/#{uuid}_#{cTime.strftime("%Y%m%d%H%M%S")}.plist"

@@ -52,7 +52,7 @@ begin
     system "rm -rf #{_outFile}"
 
     # puts "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
-    system "/usr/bin/isign   -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
+    system "/usr/bin/python ./signIpa.py -c #{certificatePem} -k #{keyPem} -p #{mobileProvision} -o #{_outFile} #{inFile}"
 
 
     plist = "/applesign/#{username}/#{certificateId}/#{gid}/#{uuid}_#{cTime.strftime("%Y%m%d%H%M%S")}.plist"
