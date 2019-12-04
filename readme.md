@@ -10,7 +10,10 @@
 5. saveCert.rb 根据p12 文件，生成相对应的 私钥和证书
 6. signIpa.rb 重新签名 ipa包
 7. signMobileConfig.rb 签名 mobileconfig 用来获取用户设备码
-
+8. nomysql/createP12.rb 用来创建p12文件
+9. 展示ipa的基本信息 使用方法
+	1. nomysql/ipaInfo.py ipa文件路径
+	2. isign -d ipa文件路径
 
 ##### 执行步骤
 1. 执行 checkLogin
