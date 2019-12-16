@@ -1,6 +1,6 @@
 
 #sql 表
-开发者表
+#开发者表
  CREATE TABLE `apple_developer` (
   `apuid` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '开发者id',
   `user` varchar(255) DEFAULT '' COMMENT '开发者帐号',
@@ -14,7 +14,7 @@
   PRIMARY KEY (`apuid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='开发者账号'
 
-证书表
+#证书表
 CREATE TABLE `apple_developer_cer` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
@@ -28,7 +28,7 @@ CREATE TABLE `apple_developer_cer` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='证书表'
 
-打包日志表
+#打包日志表
 CREATE TABLE `apple_developer_ipa_log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `uid` int(11) DEFAULT '0' COMMENT '平台用户uid',
@@ -49,7 +49,7 @@ CREATE TABLE `apple_developer_ipa_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='打包日志表'
 
-mobileprovision 表
+#mobileprovision 表
 CREATE TABLE `apple_developer_mobileprovision` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
@@ -61,7 +61,7 @@ CREATE TABLE `apple_developer_mobileprovision` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8
 
-用户设备表
+#用户设备表
 CREATE TABLE `apple_developer_uuid` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `apuid` int(11) DEFAULT '0' COMMENT '开发者id',
@@ -70,4 +70,8 @@ CREATE TABLE `apple_developer_uuid` (
   `c_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8
+
+# 增加p12 保存路径
+ALTER TABLE `apple_developer_cer`
+ADD COLUMN `p12`  varchar(255) NULL AFTER `apuid`;
 

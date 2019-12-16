@@ -114,10 +114,10 @@ begin
 	eTime = Time.parse(eTime.to_s).strftime("%Y-%m-%d %H:%M:%S")
     if results.any?
         #存在 更新
-        client.query("update apple_developer_cer set certificate_pem = '#{clientKey}', key_pem = '#{privateKey}', c_time = '#{cTime}', e_time = '#{eTime}' where certificate_id = '#{certificateId}'")
+        client.query("update apple_developer_cer set certificate_pem = '#{clientKey}', key_pem = '#{privateKey}', c_time = '#{cTime}', e_time = '#{eTime}', p12 = '#{p12Path}' where certificate_id = '#{certificateId}'")
     else
         #不存在保存
-        client.query("insert into apple_developer_cer (apuid, certificate_id, certificate_pem, key_pem, c_time, e_time)values(#{apuid}, '#{certificateId}', '#{clientKey}', '#{privateKey}', '#{cTime}', '#{eTime}')")
+        client.query("insert into apple_developer_cer (apuid, p12, certificate_id, certificate_pem, key_pem, c_time, e_time)values(#{apuid}, '#{p12Path}', '#{certificateId}', '#{clientKey}', '#{privateKey}', '#{cTime}', '#{eTime}')")
     end
 
 rescue Exception  => e
