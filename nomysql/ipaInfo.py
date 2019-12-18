@@ -31,7 +31,7 @@ def parse_args():
         description='Resign an iOS application with a new identity '
                     'and provisioning profile. See documentation for '
                     'how to obtain properly formatted credentials.')
-     parser.add_argument(
+    parser.add_argument(
         'app_paths',
         nargs=1,
         metavar='<app path>',
