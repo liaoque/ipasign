@@ -48,5 +48,6 @@ if __name__ == '__main__':
     if sys.getdefaultencoding() != defaultencoding:
         reload(sys)
         sys.setdefaultencoding(defaultencoding)
+    args = parse_args()
     bundle_info = isign.view(args.app_paths[0])
     print json.dumps(bundle_info, indent=4, separators=(',', ': '))
