@@ -34,7 +34,14 @@ begin
         certificateId = certificateObj.id
         cTime = certificateObj.created
         eTime = certificateObj.expires
+        
+    #   载入证书
+        certificate = csr
 
+        keyPath = GlobalConfig::ROOT_KEY + '/applesign/' + username + '/' + certificateId
+        system "mkdir -p #{keyPath}"
+        system "chmod 777 #{keyPath}"
+        
     #   写入证书
         x509_certificate = certificateObj.download
 
